@@ -1,41 +1,65 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# ===========================
+# etgen — Root .gitignore
+# ===========================
 
-# dependencies
-/node_modules
-/.pnp
+# ----- OS Files -----
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# ----- IDE / Editor -----
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# ----- Python -----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+venv/
+.venv/
+env/
+.env
+.env.*
+*.pyo
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ----- Node / JavaScript -----
+node_modules/
+.next/
+out/
+.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
+# ----- Build / Artifacts -----
 *.tsbuildinfo
 next-env.d.ts
+coverage/
+.vercel
+
+# ----- Docker -----
+docker-compose.override.yml
+
+# ----- Misc -----
+*.pem
+*.log
