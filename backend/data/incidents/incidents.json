@@ -1,0 +1,13 @@
+[
+    {
+        "incident_id": "INC-2023-089",
+        "date": "2023-11-05",
+        "equipment_id": "PMP-101",
+        "severity": "High",
+        "description": "Unplanned shutdown due to bearing failure on cooling pump PMP-101. Root cause traced to lack of lubrication on drive side.",
+        "action_taken": "Replaced bearings, updated PM schedule to lubricate every 3 months instead of 6.",
+        "related_documents": [
+            "OEM-PMP-101-Manual"
+        ]
+    }
+]

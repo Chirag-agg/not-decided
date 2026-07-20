@@ -1,0 +1,5 @@
+work_order_id,equipment_id,date,type,description,technician,status
+WO-10234,PMP-101,2023-10-15,Preventative,Routine lubrication and seal check.,John Doe,Completed
+WO-10567,PMP-101,2024-02-20,Corrective,Replaced worn impeller after unusual vibration detected.,Jane Smith,Completed
+WO-11002,PMP-101,2024-05-10,Inspection,"High temp on casing. No immediate action taken, added to watch list.",Mike Ross,Completed
+WO-11105,VLV-205,2024-06-01,Preventative,Actuator calibration.,John Doe,Completed
