@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(agy-doctor *)",
+      "Bash(agy-job list *)"
+    ]
+  }
+}
