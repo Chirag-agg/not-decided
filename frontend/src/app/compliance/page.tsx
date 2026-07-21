@@ -43,7 +43,7 @@ export default function Compliance() {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-zinc-950 text-zinc-100 font-sans">
+    <div className="flex flex-col md:flex-row h-screen w-full overflow-hidden bg-zinc-950 text-zinc-100 font-sans">
       <Sidebar />
       
       <main className="flex-1 flex flex-col p-8 overflow-y-auto">

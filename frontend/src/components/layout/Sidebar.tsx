@@ -47,13 +47,29 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-72 h-screen border-r border-zinc-800 bg-zinc-950 hidden md:flex flex-col shrink-0 font-sans relative z-20">
-      <div className="p-6 border-b border-zinc-800 bg-zinc-900">
-        <h1 className="text-zinc-100 font-bold tracking-wide text-xl flex items-center">
-          <span className="w-3 h-3 rounded-full bg-green-500 mr-3 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></span>
-          Industri<span className="text-zinc-500">AI</span>
+    <>
+      {/* Mobile Top Navigation */}
+      <div className="md:hidden flex items-center justify-between bg-zinc-950 border-b border-zinc-800 p-4 shrink-0 w-full z-30">
+        <h1 className="text-zinc-100 font-bold tracking-wide text-lg flex items-center">
+          <span className="w-2 h-2 rounded-full bg-green-500 mr-2 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></span>
+          IndAI
         </h1>
+        <nav className="flex space-x-5">
+          <Link href="/" className="text-zinc-400 hover:text-zinc-100"><Home size={20} /></Link>
+          <Link href="/graph" className="text-zinc-400 hover:text-zinc-100"><Database size={20} /></Link>
+          <Link href="/assets" className="text-zinc-400 hover:text-zinc-100"><Activity size={20} /></Link>
+          <Link href="/compliance" className="text-zinc-400 hover:text-zinc-100"><FileText size={20} /></Link>
+        </nav>
       </div>
+
+      {/* Desktop Sidebar */}
+      <aside className="w-72 h-screen border-r border-zinc-800 bg-zinc-950 hidden md:flex flex-col shrink-0 font-sans relative z-20">
+        <div className="p-6 border-b border-zinc-800 bg-zinc-900">
+          <h1 className="text-zinc-100 font-bold tracking-wide text-xl flex items-center">
+            <span className="w-3 h-3 rounded-full bg-green-500 mr-3 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></span>
+            Industri<span className="text-zinc-500">AI</span>
+          </h1>
+        </div>
       
       <nav className="flex-1 p-4 space-y-3">
         <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-500 mb-4 ml-2">MODULES</div>
@@ -118,6 +134,7 @@ export default function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }
 
