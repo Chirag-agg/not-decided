@@ -47,7 +47,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-72 h-screen border-r border-zinc-800 bg-zinc-950 flex flex-col shrink-0 font-sans relative z-20">
+    <aside className="w-72 h-screen border-r border-zinc-800 bg-zinc-950 hidden md:flex flex-col shrink-0 font-sans relative z-20">
       <div className="p-6 border-b border-zinc-800 bg-zinc-900">
         <h1 className="text-zinc-100 font-bold tracking-wide text-xl flex items-center">
           <span className="w-3 h-3 rounded-full bg-green-500 mr-3 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></span>
@@ -101,12 +101,6 @@ export default function Sidebar() {
         </button>
       </div>
 
-      <div className="p-4 border-t border-zinc-800">
-        <Link href="/settings" className="flex items-center space-x-4 text-zinc-500 hover:text-zinc-300 transition-colors px-4 py-2 font-semibold text-sm">
-          <Settings size={20} />
-          <span>Settings</span>
-        </Link>
-      </div>
 
       {/* Live Data Ticker */}
       <div className="p-4 bg-zinc-900 border-t border-zinc-800">

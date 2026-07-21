@@ -8,7 +8,7 @@ class Settings:
     # CORS
     CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
-        os.getenv("FRONTEND_URL", "http://localhost:3000")
+        os.getenv("FRONTEND_URL", "*")
     ]
     
     # LLM Settings

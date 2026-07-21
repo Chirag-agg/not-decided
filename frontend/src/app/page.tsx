@@ -77,7 +77,7 @@ export default function Home() {
           {/* Main Content Area */}
           <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0 w-full">
             {/* Left Column - Knowledge Graph & Telemetry */}
-            <div className="flex-1 flex flex-col h-full gap-4 overflow-hidden">
+            <div className="hidden lg:flex flex-1 flex-col h-full gap-4 overflow-hidden">
               <div className="flex-1 bg-zinc-950 border border-zinc-800 overflow-hidden relative shadow-[0_0_20px_rgba(0,0,0,0.5)]">
                 <div className="absolute top-0 left-0 w-full p-3 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-md z-10 flex justify-between items-center">
                   <span className="text-xs font-mono font-bold tracking-widest uppercase text-zinc-400">Topology Map // Live</span>
