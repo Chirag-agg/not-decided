@@ -8,7 +8,9 @@ from .rag_pipeline import query_assistant
 from .knowledge_graph import build_knowledge_graph
 from .config import settings
 from .utils.logger import get_logger
+from .utils.logger import get_logger
 from .utils.cache import cache
+from .rules_engine import evaluate_compliance, get_asset_health
 
 logger = get_logger(__name__)
 
@@ -179,3 +181,27 @@ async def upload_document(file: UploadFile = File(...)):
     except Exception as e:
         logger.error(f"Error uploading document: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail="An error occurred during file ingestion.")
+
+@app.get("/api/compliance")
+def get_compliance():
+    """Evaluates compliance rules dynamically against the live graph."""
+    try:
+        graph_data = cache.get("knowledge_graph")
+        if not graph_data:
+            graph_data = build_knowledge_graph()
+        return evaluate_compliance(graph_data)
+    except Exception as e:
+        logger.error(f"Error evaluating compliance: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to evaluate compliance.")
+
+@app.get("/api/assets")
+def get_assets():
+    """Extracts dynamic asset health metrics from the live graph."""
+    try:
+        graph_data = cache.get("knowledge_graph")
+        if not graph_data:
+            graph_data = build_knowledge_graph()
+        return get_asset_health(graph_data)
+    except Exception as e:
+        logger.error(f"Error fetching assets: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to retrieve asset data.")

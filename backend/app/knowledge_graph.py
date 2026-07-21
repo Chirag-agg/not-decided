@@ -8,21 +8,28 @@ def build_knowledge_graph():
     
     # 1. EQUIPMENT NODES (Blue)
     equipment = [
-        ("PMP-101", "Main Cooling Pump A"),
-        ("PMP-102", "Aux Cooling Pump B"),
-        ("MTR-501", "Pump Motor A"),
-        ("MTR-502", "Pump Motor B"),
-        ("VLV-201", "Inlet Valve A"),
-        ("VLV-202", "Outlet Valve A"),
-        ("VLV-203", "Bypass Valve"),
-        ("HX-301", "Primary Heat Exchanger"),
-        ("SEN-T1", "Temp Sensor Inlet"),
-        ("SEN-T2", "Temp Sensor Outlet"),
-        ("SEN-V1", "Vibration Sensor Motor A"),
-        ("SEN-V2", "Vibration Sensor Pump A"),
+        {"id": "PMP-101", "label": "Main Cooling Pump A", "type": "Centrifugal Pump", "health": 68, "lastMaint": "2026-06-12"},
+        {"id": "PMP-102", "label": "Aux Cooling Pump B", "type": "Centrifugal Pump", "health": 95, "lastMaint": "2026-07-15"},
+        {"id": "MTR-501", "label": "Pump Motor A", "type": "Induction Motor", "health": 92, "lastMaint": "2026-07-01"},
+        {"id": "MTR-502", "label": "Pump Motor B", "type": "Induction Motor", "health": 88, "lastMaint": "2026-06-20"},
+        {"id": "VLV-201", "label": "Inlet Valve A", "type": "Control Valve", "health": 85, "lastMaint": "2026-06-28"},
+        {"id": "VLV-202", "label": "Outlet Valve A", "type": "Control Valve", "health": 80, "lastMaint": "2026-06-10"},
+        {"id": "VLV-203", "label": "Bypass Valve", "type": "Control Valve", "health": 99, "lastMaint": "2026-07-18"},
+        {"id": "HX-301", "label": "Primary Heat Exchanger", "type": "Heat Exchanger", "health": 74, "lastMaint": "2026-05-15"},
+        {"id": "SEN-T1", "label": "Temp Sensor Inlet", "type": "Sensor", "health": 98, "lastMaint": "2026-07-19"},
+        {"id": "SEN-T2", "label": "Temp Sensor Outlet", "type": "Sensor", "health": 97, "lastMaint": "2026-07-19"},
+        {"id": "SEN-V1", "label": "Vibration Sensor Motor A", "type": "Sensor", "health": 99, "lastMaint": "2026-07-19"},
+        {"id": "SEN-V2", "label": "Vibration Sensor Pump A", "type": "Sensor", "health": 99, "lastMaint": "2026-07-19"},
     ]
-    for eq_id, label in equipment:
-        G.add_node(eq_id, label=f"Eq: {label}", group="Equipment")
+    for eq in equipment:
+        G.add_node(
+            eq["id"], 
+            label=f"Eq: {eq['label']}", 
+            group="Equipment", 
+            equipment_type=eq["type"],
+            health_score=eq["health"],
+            last_inspection_date=eq["lastMaint"]
+        )
 
     # Equipment physical relationships
     physical_links = [
