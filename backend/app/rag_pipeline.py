@@ -153,23 +153,27 @@ class Orchestrator:
     def _extract_entity(self, query: str, graph_data: dict) -> Optional[str]:
         query_lower = query.lower()
         
-        # Search the live graph for a matching node ID or label
+        # Pass 1: Exact ID matches
         for node in graph_data.get("nodes", []):
             node_id = node["id"].lower()
-            # If the exact ID appears in the query
             if node_id in query_lower:
                 return node["id"]
-            
-            # Simple fallback for labels (e.g. "Aux Cooling Pump B")
-            # We enforce length > 4 to avoid matching tiny generic words like "Pump" everywhere
+                
+        # Pass 2: Best label match (longest matching substring)
+        best_match_id = None
+        longest_match_len = 0
+        
+        for node in graph_data.get("nodes", []):
             label = node.get("label", "").lower()
-            # Remove prefixes like "Eq: " or "Doc: " for matching
             clean_label = label.split(":", 1)[-1].strip()
             
+            # Enforce length > 4 to avoid matching tiny generic words
             if len(clean_label) > 4 and clean_label in query_lower:
-                return node["id"]
-                
-        return None
+                if len(clean_label) > longest_match_len:
+                    longest_match_len = len(clean_label)
+                    best_match_id = node["id"]
+                    
+        return best_match_id
 
     def execute_query(self, query: str) -> Tuple[str, List[str], Optional[str], List[str], Optional[str]]:
         self.traces.clear()
