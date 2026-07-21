@@ -18,7 +18,11 @@ class BaseAgent:
         logger.info(msg)
 
 
-class VectorSearchAgent(BaseAgent):
+class DocumentRetrievalAgent(BaseAgent):
+    """
+    Retrieves connected documents by walking graph edges.
+    Renamed from VectorSearchAgent because there is no actual vector DB.
+    """
     def execute(self, entity_id: Optional[str], graph_data: dict) -> List[str]:
         if not entity_id:
             return []
@@ -145,7 +149,7 @@ class ActionAgent(BaseAgent):
 class Orchestrator:
     def __init__(self):
         self.traces: List[str] = []
-        self.vector_agent = VectorSearchAgent(self.traces)
+        self.doc_agent = DocumentRetrievalAgent(self.traces)
         self.graph_agent = GraphTraversalAgent(self.traces)
         self.synthesis_agent = SynthesisAgent(self.traces)
         self.action_agent = ActionAgent(self.traces)
@@ -188,18 +192,18 @@ class Orchestrator:
         # 1. Extract Entities from Live Graph
         entity_id = self._extract_entity(query, graph_data)
         if entity_id:
-            self.vector_agent._log_trace("ORCHESTRATOR", f"Extracted Entity ID: {entity_id}")
+            self.doc_agent._log_trace("ORCHESTRATOR", f"Extracted Entity ID: {entity_id}")
         else:
-            self.vector_agent._log_trace("ORCHESTRATOR", "No specific entity ID extracted.")
+            self.doc_agent._log_trace("ORCHESTRATOR", "No specific entity ID extracted.")
             
-        # 2. Search Vector Space (Graph Edges -> Documents)
-        docs = self.vector_agent.execute(entity_id, graph_data)
+        # 2. Vector/Document Search
+        doc_context = self.doc_agent.execute(entity_id, graph_data)
         
         # 3. Traverse Graph (Graph Edges -> Incidents/WOs)
         graph_nodes = self.graph_agent.execute(entity_id, graph_data)
             
         # 4. Synthesize
-        answer, requires_action = self.synthesis_agent.execute(docs, graph_nodes, query, entity_id, graph_data)
+        answer, requires_action = self.synthesis_agent.execute(doc_context, graph_nodes, query, entity_id, graph_data)
         
         # 5. Determine Actions
         action = self.action_agent.execute(requires_action, entity_id)
