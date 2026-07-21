@@ -31,6 +31,7 @@ class QueryResponse(BaseModel):
     sources: list[str]
     action: str | None = None
     traces: list[str] = []
+    matched_entity_id: str | None = None
 
 @app.on_event("startup")
 async def startup_event():
@@ -47,8 +48,14 @@ def read_root():
 @app.post("/api/chat", response_model=QueryResponse)
 def chat_with_copilot(request: QueryRequest):
     try:
-        response, sources, action, traces = query_assistant(request.query)
-        return {"answer": response, "sources": sources, "action": action, "traces": traces}
+        response, sources, action, traces, matched_entity_id = query_assistant(request.query)
+        return {
+            "answer": response, 
+            "sources": sources, 
+            "action": action, 
+            "traces": traces,
+            "matched_entity_id": matched_entity_id
+        }
     except Exception as e:
         logger.error(f"Error processing chat query: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail="An internal error occurred while processing your request.")

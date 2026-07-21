@@ -1,17 +1,12 @@
-import re
+import random
 import requests
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Any, Dict
 from .config import settings
 from .utils.logger import get_logger
+from .utils.cache import cache
+from .knowledge_graph import build_knowledge_graph
 
 logger = get_logger(__name__)
-
-# Known Equipment IDs for simple Entity Extraction
-KNOWN_EQUIPMENT = [
-    "PMP-101", "PMP-102", "MTR-501", "MTR-502", 
-    "VLV-201", "VLV-202", "VLV-203", "HX-301", 
-    "SEN-T1", "SEN-T2", "SEN-V1", "SEN-V2"
-]
 
 class BaseAgent:
     def __init__(self, trace_log: List[str]):
@@ -24,45 +19,76 @@ class BaseAgent:
 
 
 class VectorSearchAgent(BaseAgent):
-    def execute(self, query: str) -> List[str]:
-        self._log_trace("SYS_AGENT_SEARCH", f"Querying vector space (dim=1536) for: '{query}'")
-        
-        # Simulating vector retrieval based on basic keyword matching for demo purposes
-        if "vibration" in query.lower() or "pump" in query.lower() or "pmp-101" in query.lower():
-            self._log_trace("SYS_AGENT_SEARCH", "Retrieved 3 high-confidence chunks from PMP-101_OEM_Manual")
-            return ["PMP-101_OEM_Manual.txt"]
-        else:
-            self._log_trace("SYS_AGENT_SEARCH", "No specific equipment vectors matched.")
+    def execute(self, entity_id: Optional[str], graph_data: dict) -> List[str]:
+        if not entity_id:
             return []
+            
+        self._log_trace("SYS_AGENT_SEARCH", f"Mock Vector Search: Querying graph for documents related to {entity_id}")
+        
+        related_docs = []
+        for link in graph_data.get("links", []):
+            if link["source"] == entity_id or link["target"] == entity_id:
+                neighbor_id = link["target"] if link["source"] == entity_id else link["source"]
+                # Verify if neighbor is a Document
+                neighbor_node = next((n for n in graph_data.get("nodes", []) if n["id"] == neighbor_id), None)
+                if neighbor_node and neighbor_node.get("group") == "Document":
+                    related_docs.append(neighbor_id)
+                    
+        if related_docs:
+            self._log_trace("SYS_AGENT_SEARCH", f"Found {len(related_docs)} related documents.")
+        else:
+            self._log_trace("SYS_AGENT_SEARCH", f"No specific document vectors matched for {entity_id}.")
+            
+        return related_docs
 
 
 class GraphTraversalAgent(BaseAgent):
-    def execute(self, entity_id: str) -> List[str]:
+    def execute(self, entity_id: Optional[str], graph_data: dict) -> List[str]:
+        if not entity_id:
+            return []
+            
         self._log_trace("SYS_AGENT_GRAPH", f"Traversing knowledge graph for entity: {entity_id}")
         
-        # Simulating graph traversal
-        if entity_id == "PMP-101":
-            self._log_trace("SYS_AGENT_GRAPH", "Found historical incident INC-23-089 (Bearing Failure)")
-            self._log_trace("SYS_AGENT_GRAPH", "Found related Work Orders: WO-102 (Lube PMP-101)")
-            return ["INC-23-089", "WO-102"]
-        elif entity_id:
-            self._log_trace("SYS_AGENT_GRAPH", f"Found active monitoring nodes for {entity_id}")
-            return [f"MONITOR-{entity_id}"]
-        return []
+        related_nodes = []
+        for link in graph_data.get("links", []):
+            if link["source"] == entity_id or link["target"] == entity_id:
+                neighbor_id = link["target"] if link["source"] == entity_id else link["source"]
+                neighbor_node = next((n for n in graph_data.get("nodes", []) if n["id"] == neighbor_id), None)
+                if neighbor_node and neighbor_node.get("group") != "Document":
+                    related_nodes.append(neighbor_id)
+                    
+        if related_nodes:
+            self._log_trace("SYS_AGENT_GRAPH", f"Found graph neighbors: {', '.join(related_nodes)}")
+        else:
+            self._log_trace("SYS_AGENT_GRAPH", f"No non-document neighbors found for {entity_id}")
+            
+        return related_nodes
 
 
 class SynthesisAgent(BaseAgent):
-    def execute(self, context_docs: List[str], graph_nodes: List[str], query: str, entity_id: Optional[str]) -> Tuple[str, bool]:
+    def execute(self, context_docs: List[str], graph_nodes: List[str], query: str, entity_id: Optional[str], graph_data: dict) -> Tuple[str, bool]:
         self._log_trace("SYS_AGENT_SYNTH", "Fusing cross-modal context (Vectors + Graph)")
         
-        if "PMP-101_OEM_Manual.txt" in context_docs and "INC-23-089" in graph_nodes:
-            self._log_trace("SYS_AGENT_SYNTH", "Anomaly detected: Current query matches historical incident signature.")
+        if entity_id:
+            entity_node = next((n for n in graph_data.get("nodes", []) if n["id"] == entity_id), {})
+            entity_label = entity_node.get("label", entity_id)
+            
+            # Segregate graph nodes
+            incidents = [n for n in graph_nodes if "INC-" in n]
+            work_orders = [n for n in graph_nodes if "WO-" in n]
+            
+            incident_text = ", ".join(incidents) if incidents else "No incident history on record."
+            wo_text = ", ".join(work_orders) if work_orders else "No related work orders."
+            doc_text = ", ".join(context_docs) if context_docs else "No reference manuals found."
             
             prompt = (
-                f"You are an Industrial AI Expert. A user asked: '{query}'. "
-                "Context: The equipment is PMP-101. It has a history of bearing failures (INC-23-089). "
-                "The OEM manual states warning vibration is > 4.5 mm/s. "
-                "Write a highly professional, short technical diagnostic (3-4 sentences max) recommending an immediate inspection."
+                f"You are an Industrial AI Expert. A user asked: '{query}'.\n"
+                f"Context: The equipment is {entity_id} ({entity_label}).\n"
+                f"Related Documents: {doc_text}\n"
+                f"Related Incidents: {incident_text}\n"
+                f"Related Work Orders: {wo_text}\n"
+                "Using only the context provided, write a highly professional, short technical diagnostic (3-4 sentences max). "
+                "If no incidents or work orders exist, state that the equipment is operating normally and has no recent history."
             )
             
             self._log_trace("SYS_AGENT_SYNTH", f"Generating response via local LLM ({settings.MODEL_NAME})...")
@@ -77,23 +103,33 @@ class SynthesisAgent(BaseAgent):
                 answer = res.json().get("response", "").strip()
                 self._log_trace("SYS_AGENT_SYNTH", "LLM generation successful.")
             except Exception as e:
-                # Fallback to mock if Ollama isn't running or times out
                 logger.warning(f"LLM generation failed: {str(e)}. Using cached heuristic.")
-                self._log_trace("SYS_AGENT_SYNTH", "LLM generation failed. Using cached heuristic.")
-                answer = (
-                    "Based on the unified knowledge base, centrifugal pump PMP-101 has a history of bearing failures related to vibration. "
-                    "A past incident (INC-23-089) caused an unplanned shutdown due to lack of lubrication.\n\n"
-                    "According to the OEM Manual, warning vibration is > 4.5 mm/s. The recommended troubleshooting step is to check "
-                    "lubrication and replace bearings if worn. Given the historical graph data, I recommend an immediate inspection."
-                )
-            return answer, True
-        elif entity_id:
-            self._log_trace("SYS_AGENT_SYNTH", f"Generating contextual summary for {entity_id}")
-            answer = f"I've checked the knowledge graph for {entity_id}. All systems are currently reporting nominal values. Would you like me to pull the latest maintenance logs?"
-            return answer, False
+                self._log_trace("SYS_AGENT_SYNTH", "LLM generation failed. Using cached template.")
+                
+                if incidents:
+                    answer = (
+                        f"Based on the unified knowledge base, {entity_label} ({entity_id}) has a known history involving: {incident_text}. "
+                        f"Reference manuals ({doc_text}) suggest checking recent work orders ({wo_text}). "
+                        f"Given the historical graph data, I recommend a proactive inspection."
+                    )
+                else:
+                    answer = (
+                        f"I've checked the knowledge graph for {entity_label} ({entity_id}). "
+                        f"There are no incidents on record for this equipment. All systems appear nominal. "
+                        f"Relevant documents available: {doc_text}."
+                    )
+            return answer, len(incidents) > 0
         else:
             self._log_trace("SYS_AGENT_SYNTH", "Insufficient context for definitive diagnostic.")
-            answer = "I searched the manuals and knowledge base. Please provide more specific equipment IDs like 'PMP-101' or symptoms like 'vibration' so I can narrow down the root cause."
+            
+            # Pick a few random equipment tags to suggest
+            equip_nodes = [n["id"] for n in graph_data.get("nodes", []) if n.get("group") == "Equipment"]
+            suggestions = random.sample(equip_nodes, min(3, len(equip_nodes))) if equip_nodes else ["PMP-101"]
+            
+            answer = (
+                "I searched the unified knowledge base but couldn't identify the specific equipment you're referring to. "
+                f"Please provide a specific equipment ID (for example: {', '.join(suggestions)}) so I can pull the relevant telemetry and graph context."
+            )
             return answer, False
 
 
@@ -114,43 +150,52 @@ class Orchestrator:
         self.synthesis_agent = SynthesisAgent(self.traces)
         self.action_agent = ActionAgent(self.traces)
 
-    def _extract_entity(self, query: str) -> Optional[str]:
-        # Simple entity extraction using regex or known list
-        query_upper = query.upper()
+    def _extract_entity(self, query: str, graph_data: dict) -> Optional[str]:
+        query_lower = query.lower()
         
-        # 1. Check against known list
-        for eq in KNOWN_EQUIPMENT:
-            if eq in query_upper:
-                return eq
-                
-        # 2. Check for generic ID patterns like XXX-123
-        match = re.search(r'[A-Z]{3}-\d{3}', query_upper)
-        if match:
-            return match.group(0)
+        # Search the live graph for a matching node ID or label
+        for node in graph_data.get("nodes", []):
+            node_id = node["id"].lower()
+            # If the exact ID appears in the query
+            if node_id in query_lower:
+                return node["id"]
             
+            # Simple fallback for labels (e.g. "Aux Cooling Pump B")
+            # We enforce length > 4 to avoid matching tiny generic words like "Pump" everywhere
+            label = node.get("label", "").lower()
+            # Remove prefixes like "Eq: " or "Doc: " for matching
+            clean_label = label.split(":", 1)[-1].strip()
+            
+            if len(clean_label) > 4 and clean_label in query_lower:
+                return node["id"]
+                
         return None
 
-    def execute_query(self, query: str) -> Tuple[str, List[str], Optional[str], List[str]]:
+    def execute_query(self, query: str) -> Tuple[str, List[str], Optional[str], List[str], Optional[str]]:
         self.traces.clear()
+        
+        # 0. Fetch Live Graph Context
         self.vector_agent._log_trace("ORCHESTRATOR", "Initializing query resolution pipeline.")
+        graph_data = cache.get("knowledge_graph")
+        if not graph_data:
+            graph_data = build_knowledge_graph()
+            cache.set("knowledge_graph", graph_data)
         
-        # 1. Search Vector Space
-        docs = self.vector_agent.execute(query)
-        
-        # 2. Extract Entities
-        entity_id = self._extract_entity(query)
+        # 1. Extract Entities from Live Graph
+        entity_id = self._extract_entity(query, graph_data)
         if entity_id:
             self.vector_agent._log_trace("ORCHESTRATOR", f"Extracted Entity ID: {entity_id}")
         else:
             self.vector_agent._log_trace("ORCHESTRATOR", "No specific entity ID extracted.")
+            
+        # 2. Search Vector Space (Graph Edges -> Documents)
+        docs = self.vector_agent.execute(entity_id, graph_data)
         
-        # 3. Traverse Graph
-        graph_nodes = []
-        if entity_id:
-            graph_nodes = self.graph_agent.execute(entity_id)
+        # 3. Traverse Graph (Graph Edges -> Incidents/WOs)
+        graph_nodes = self.graph_agent.execute(entity_id, graph_data)
             
         # 4. Synthesize
-        answer, requires_action = self.synthesis_agent.execute(docs, graph_nodes, query, entity_id)
+        answer, requires_action = self.synthesis_agent.execute(docs, graph_nodes, query, entity_id, graph_data)
         
         # 5. Determine Actions
         action = self.action_agent.execute(requires_action, entity_id)
@@ -158,7 +203,7 @@ class Orchestrator:
         sources = docs + graph_nodes
         self.vector_agent._log_trace("ORCHESTRATOR", f"Pipeline complete. Yielding {len(sources)} sources and {1 if action else 0} action.")
         
-        return answer, sources, action, list(self.traces)
+        return answer, sources, action, list(self.traces), entity_id
 
 
 def query_assistant(query: str):

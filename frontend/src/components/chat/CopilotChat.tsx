@@ -16,6 +16,7 @@ interface Message {
   sources?: string[];
   action?: string | null;
   traces?: string[];
+  matched_entity_id?: string | null;
 }
 
 export default function CopilotChat() {
@@ -98,14 +99,14 @@ export default function CopilotChat() {
         setActiveTraces([]);
       }
       
-      // Auto-focus node if mentioned
-      if (data.answer.includes("PMP-101")) {
-        setFocusedNode("PMP-101");
+      // Auto-focus node if mentioned dynamically
+      if (data.matched_entity_id) {
+        setFocusedNode(data.matched_entity_id);
       }
       
       setMessages((prev) => [
         ...prev, 
-        { role: "bot", content: data.answer, sources: data.sources, action: data.action, traces: data.traces }
+        { role: "bot", content: data.answer, sources: data.sources, action: data.action, traces: data.traces, matched_entity_id: data.matched_entity_id }
       ]);
     } catch (error) {
       console.error(error);
