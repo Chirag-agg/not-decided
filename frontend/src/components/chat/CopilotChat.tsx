@@ -5,6 +5,10 @@ import { Send, Terminal, Mic } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useGraphContext } from "@/components/graph/GraphContext";
+import DOMPurify from "dompurify";
+import { config } from "@/utils/config";
+import { CONSTANTS } from "@/utils/constants";
+import { fetchWithRetry } from "@/utils/api";
 
 interface Message {
   role: "user" | "bot";
@@ -72,7 +76,7 @@ export default function CopilotChat() {
     setWoStatus("idle"); // Reset status
 
     try {
-      const res = await fetch("http://localhost:8000/api/chat", {
+      const res = await fetchWithRetry(`${config.apiBaseUrl}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: userMsg.content }),
@@ -86,10 +90,10 @@ export default function CopilotChat() {
       if (data.traces && data.traces.length > 0) {
         setIsSimulatingTraces(true);
         for (let i = 0; i < data.traces.length; i++) {
-          await new Promise(resolve => setTimeout(resolve, 300));
+          await new Promise(resolve => setTimeout(resolve, CONSTANTS.TIMEOUTS.AGENT_TRACE_DELAY));
           setActiveTraces(prev => [...prev, data.traces[i]]);
         }
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve, CONSTANTS.TIMEOUTS.AGENT_TRACE_DELAY));
         setIsSimulatingTraces(false);
         setActiveTraces([]);
       }
@@ -115,9 +119,9 @@ export default function CopilotChat() {
 
   const handleApproveWo = async () => {
     setWoStatus("saving");
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate ERP save
+    await new Promise(resolve => setTimeout(resolve, CONSTANTS.TIMEOUTS.ERP_SAVE_SIMULATION)); // Simulate ERP save
     setWoStatus("success");
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, CONSTANTS.TIMEOUTS.ERP_SUCCESS_DISPLAY));
     setShowWoModal(false);
     
     // Add success message to chat
@@ -168,7 +172,10 @@ export default function CopilotChat() {
                   </div>
                 )}
                 
-                <p className="whitespace-pre-wrap leading-relaxed text-[15px]">{msg.content}</p>
+                <p 
+                  className="whitespace-pre-wrap leading-relaxed text-[15px]" 
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(msg.content) }} 
+                />
                 
                 {msg.sources && msg.sources.length > 0 && (
                   <div className="mt-3 pt-3 border-t border-zinc-700/50 flex flex-wrap gap-2">

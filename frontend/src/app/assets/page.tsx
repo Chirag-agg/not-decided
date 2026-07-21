@@ -1,4 +1,5 @@
 import Sidebar from "@/components/layout/Sidebar";
+import { StatusBadge, BadgeStatus } from "@/components/ui/StatusBadge";
 
 export default function AssetHealth() {
   const assets = [
@@ -47,13 +48,7 @@ export default function AssetHealth() {
 
                 {/* Risk Badge */}
                 <div>
-                  <span className={`px-2 py-1 uppercase tracking-widest text-[9px] border ${
-                    asset.risk > 70 ? 'bg-red-950 text-red-400 border-red-900' : 
-                    asset.risk > 30 ? 'bg-amber-950 text-amber-400 border-amber-900' : 
-                    'bg-green-950 text-green-400 border-green-900'
-                  }`}>
-                    {asset.risk}% RISK
-                  </span>
+                  <StatusBadge status={asset.status as BadgeStatus} showIcon={false} />
                 </div>
 
                 <div className="text-zinc-500">{asset.lastMaint}</div>

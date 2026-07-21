@@ -4,6 +4,9 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import useMeasure from "react-use-measure";
 import { useGraphContext } from "./GraphContext";
+import { config } from "@/utils/config";
+import { CONSTANTS } from "@/utils/constants";
+import { fetchWithRetry } from "@/utils/api";
 
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
   ssr: false,
@@ -37,7 +40,7 @@ export default function KnowledgeGraph() {
   useEffect(() => {
     const fetchGraph = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/graph");
+        const res = await fetchWithRetry(`${config.apiBaseUrl}/api/graph`);
         const data = await res.json();
         if (data.edges && !data.links) {
           data.links = data.edges;
@@ -56,11 +59,11 @@ export default function KnowledgeGraph() {
   // Muted, professional color palette
   const getNodeColor = (group: string) => {
     switch (group) {
-      case "Equipment": return "#60a5fa"; // Blue-400
-      case "Document": return "#4ade80"; // Green-400
-      case "Incident": return "#f87171"; // Red-400
-      case "WorkOrder": return "#fbbf24"; // Amber-400
-      default: return "#a1a1aa";
+      case "Equipment": return CONSTANTS.GRAPH_COLORS.EQUIPMENT;
+      case "Document": return CONSTANTS.GRAPH_COLORS.DOCUMENT;
+      case "Incident": return CONSTANTS.GRAPH_COLORS.INCIDENT;
+      case "WorkOrder": return CONSTANTS.GRAPH_COLORS.WORK_ORDER;
+      default: return CONSTANTS.GRAPH_COLORS.DEFAULT;
     }
   };
 
@@ -98,6 +101,15 @@ export default function KnowledgeGraph() {
         <span className="flex items-center"><span className="w-1.5 h-1.5 bg-amber-400 mr-1.5"></span> Work Orders</span>
       </div>
       
+      {loading ? (
+        <div className="absolute inset-0 flex items-center justify-center flex-col z-20">
+          <div className="w-12 h-12 border-4 border-zinc-800 border-t-blue-500 rounded-full animate-spin mb-4 shadow-[0_0_15px_rgba(59,130,246,0.3)]"></div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 animate-pulse">
+            Querying Knowledge Graph...
+          </div>
+        </div>
+      ) : null}
+      
       {!loading && graphData.nodes.length > 0 && bounds.width > 0 && (
         <ForceGraph2D
           ref={fgRef}
@@ -105,7 +117,7 @@ export default function KnowledgeGraph() {
           height={bounds.height}
           graphData={graphData}
           nodeCanvasObject={drawNode}
-          linkColor={() => "#27272a"} // Zinc-800
+          linkColor={() => CONSTANTS.GRAPH_COLORS.LINK}
           linkWidth={1}
           linkDirectionalParticles={1}
           linkDirectionalParticleSpeed={0.005}

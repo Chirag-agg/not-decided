@@ -5,6 +5,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import KnowledgeGraph from "@/components/graph/KnowledgeGraph";
 import CopilotChat from "@/components/chat/CopilotChat";
 import { motion, AnimatePresence } from "framer-motion";
+import { CONSTANTS } from "@/utils/constants";
 
 export default function Home() {
   const [booting, setBooting] = useState(true);
@@ -22,7 +23,7 @@ export default function Home() {
 
     let delay = 0;
     bootSequence.forEach((line, index) => {
-      delay += Math.random() * 200 + 100; // 100-300ms per line
+      delay += Math.random() * (CONSTANTS.TIMEOUTS.BOOT_SEQUENCE_DELAY_MAX - CONSTANTS.TIMEOUTS.BOOT_SEQUENCE_DELAY_MIN) + CONSTANTS.TIMEOUTS.BOOT_SEQUENCE_DELAY_MIN;
       setTimeout(() => {
         setBootText(prev => prev + line + "\n");
         if (index === bootSequence.length - 1) {
@@ -142,7 +143,7 @@ function TelemetryStream() {
         if (newLogs.length > 50) newLogs.shift();
         return newLogs;
       });
-    }, 300); // Fast stream
+    }, CONSTANTS.TIMEOUTS.TELEMETRY_INTERVAL);
 
     return () => clearInterval(interval);
   }, []);

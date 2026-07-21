@@ -5,6 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 import { GraphProvider } from "@/components/graph/GraphContext";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = {
   title: "IndustriAI | Knowledge Brain",
@@ -19,9 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-background text-foreground`}>
-        <GraphProvider>
-          {children}
-        </GraphProvider>
+        <ErrorBoundary>
+          <GraphProvider>
+            {children}
+          </GraphProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

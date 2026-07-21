@@ -3,6 +3,9 @@
 import { Home, Database, Activity, FileText, Settings, UploadCloud } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef } from "react";
+import { config } from "@/utils/config";
+import { CONSTANTS } from "@/utils/constants";
+import { fetchWithRetry } from "@/utils/api";
 
 export default function Sidebar() {
   const [isUploading, setIsUploading] = useState(false);
@@ -20,7 +23,7 @@ export default function Sidebar() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:8000/api/upload", {
+      const res = await fetchWithRetry(`${config.apiBaseUrl}/api/upload`, {
         method: "POST",
         body: formData,
       });
@@ -35,7 +38,7 @@ export default function Sidebar() {
       setTimeout(() => {
         setIsUploading(false);
         setUploadStatus(null);
-      }, 3000);
+      }, CONSTANTS.TIMEOUTS.UPLOAD_SIMULATION);
     }
   };
 

@@ -1,5 +1,5 @@
 import Sidebar from "@/components/layout/Sidebar";
-import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { StatusBadge, BadgeStatus } from "@/components/ui/StatusBadge";
 
 export default function Compliance() {
   const complianceItems = [
@@ -36,19 +36,7 @@ export default function Compliance() {
                 <div className="col-span-2 text-zinc-400">{item.desc}</div>
                 
                 {/* Status Badge */}
-                <div className="flex items-center space-x-2">
-                  {item.status === "PASS" && <CheckCircle size={14} className="text-green-500" />}
-                  {item.status === "WARNING" && <AlertCircle size={14} className="text-amber-500" />}
-                  {item.status === "FAIL" && <XCircle size={14} className="text-red-500" />}
-                  
-                  <span className={`px-2 py-1 uppercase tracking-widest text-[9px] border ${
-                    item.status === 'FAIL' ? 'bg-red-950 text-red-400 border-red-900' : 
-                    item.status === 'WARNING' ? 'bg-amber-950 text-amber-400 border-amber-900' : 
-                    'bg-green-950 text-green-400 border-green-900'
-                  }`}>
-                    {item.status}
-                  </span>
-                </div>
+                <StatusBadge status={item.status as BadgeStatus} showIcon={true} />
 
                 <div className="text-zinc-500">{item.date}</div>
                 <div className="text-zinc-500">{item.owner}</div>
