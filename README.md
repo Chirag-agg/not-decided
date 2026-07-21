@@ -1,10 +1,10 @@
 <h1 align="center">
-  ⚡ etgen
+  ⚡ IndustriAI
 </h1>
 
 <p align="center">
   <b>Industrial Knowledge Intelligence Platform</b><br/>
-  A multi-agent RAG system with knowledge graph visualization for enterprise asset management.
+  A multi-agent AI system powered by a live Knowledge Graph hub for enterprise asset management, compliance, and automated diagnostics.
 </p>
 
 <p align="center">
@@ -12,57 +12,59 @@
   <img src="https://img.shields.io/badge/FastAPI-0.100+-009688?logo=fastapi" alt="FastAPI" />
   <img src="https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white" alt="Python" />
   <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/License-MIT-green" alt="License" />
 </p>
 
 ---
 
-## Overview
+## 🎯 Overview
 
-**etgen** is an enterprise-grade Industrial Knowledge Intelligence platform that combines:
+**IndustriAI** eliminates knowledge fragmentation in asset-intensive industries by merging heterogeneous unstructured data (PDFs, manuals, incident reports) into a single, unified Knowledge Graph. 
 
-- 🤖 **Multi-Agent RAG Pipeline** — ReAct-style reasoning over equipment manuals, incident reports, and maintenance logs
-- 🕸️ **Knowledge Graph Visualization** — Interactive force-directed graph of equipment, documents, incidents, and work orders
-- 💬 **AI Copilot Chat** — Natural-language diagnostics with agent trace visibility
-- 📋 **Compliance & Asset Management** — Structured views for maintenance workflows
+Unlike standard RAG pipelines that use isolated Vector Databases, this platform operates on a **Unified Hub Architecture**. When a document is ingested, it mutates a live graph topology. The AI Copilot and the Compliance Rule Engine both evaluate this exact same topology in real-time, providing ground-truth intelligence that is structurally traceable.
 
-## Architecture
+### Core Features
+- 🕸️ **Unified Graph Hub**: A live `NetworkX` graph cache that acts as the single source of truth for the entire application.
+- 🤖 **Multi-Agent Orchestrator**: 4 autonomous agents (Document Retrieval, Graph Traversal, Synthesis, Action) that walk graph edges to diagnose complex machinery issues.
+- 📋 **Structural Compliance Engine**: A headless rules engine that constantly evaluates the graph for regulatory gaps (e.g., detecting if an equipment node has an incident with no attached work order).
+- 📲 **Field-Ready UI**: A fully responsive, dark-mode dashboard built for mobile field technicians, featuring live IoT telemetry and force-directed topology visualizations.
+
+## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│                  Frontend                   │
-│          Next.js 16 · React 19             │
-│   Dashboard · Graph · Chat · Compliance     │
-└──────────────────┬──────────────────────────┘
-                   │ REST API
-┌──────────────────▼──────────────────────────┐
-│                  Backend                    │
-│            FastAPI · Python 3.11+           │
-│   Multi-Agent Engine · Knowledge Graph      │
-│   Vector Search · Graph Traversal           │
-└─────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────┐
+│                   Next.js Frontend                     │
+│    Dashboard · Live Topology · Copilot Chat · QMS      │
+└──────────────────────────┬─────────────────────────────┘
+                           │ REST API
+┌──────────────────────────▼─────────────────────────────┐
+│                   FastAPI Backend                      │
+│                                                        │
+│  [Ingestion] ────► [KNOWLEDGE GRAPH] ◄──── [Rules]     │
+│                           ▲                            │
+│                      [RAG Agents]                      │
+└────────────────────────────────────────────────────────┘
 ```
 
-## Quick Start
+*(See `architecture_diagram.md` for a detailed technical schematic).*
+
+## 🚀 Quick Start
 
 ### Prerequisites
-
 - **Node.js** ≥ 18
 - **Python** ≥ 3.11
-- (Optional) **Docker** & **Docker Compose**
+- **Ollama** (Running locally with `llama3:latest` for the LLM fallback to work. If not running, the platform safely uses heuristic synthesis).
 
 ### Option 1 — Docker Compose
 
 ```bash
 docker compose up --build
 ```
-
-Frontend: [http://localhost:3000](http://localhost:3000) · Backend: [http://localhost:8000](http://localhost:8000)
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8000`
 
 ### Option 2 — Manual Setup
 
-**Backend:**
-
+**1. Start the Backend:**
 ```bash
 cd backend
 python -m venv venv
@@ -72,47 +74,38 @@ python -m app.generate_mock_data
 uvicorn app.main:app --reload --port 8000
 ```
 
-**Frontend:**
-
+**2. Start the Frontend:**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-## Project Structure
+## 🎥 Running the Golden Path Demo
+
+1. **Open the App**: Navigate to `http://localhost:3000`.
+2. **View the Topology**: Click the `Knowledge Base` module. You will see the live factory graph.
+3. **Ingest Unstructured Data**: Click the `Upload` button in the sidebar and select a sample incident report (e.g., `sample_manual.txt`).
+4. **Watch the Graph Mutate**: The pipeline will parse the text via regex, extract the equipment (`MTR-999`) and incident (`INC-23-089`), and instantly inject them into the live topology.
+5. **Test the Copilot**: Ask the chat: `"What is the status of MTR-999?"`. The Multi-Agent Orchestrator will walk the graph edges, pass the context to the LLM, and focus the UI explicitly on the new node.
+6. **Verify Compliance**: Navigate to the `Compliance` module. You will see the new incident has been automatically flagged as a regulatory violation because it lacks a connected Work Order. Click `Gen Evidence` to generate the audit package.
+
+## 📁 Project Structure
 
 ```
 etgen/
 ├── backend/
-│   ├── app/                    # Python package
-│   │   ├── main.py             # FastAPI application
-│   │   ├── knowledge_graph.py  # NetworkX graph builder
-│   │   ├── rag_pipeline.py     # Multi-agent RAG engine
-│   │   └── generate_mock_data.py
-│   ├── data/                   # Mock data (manuals, logs, incidents)
-│   ├── requirements.txt
-│   └── Dockerfile
+│   ├── app/
+│   │   ├── main.py             # FastAPI App & Endpoints
+│   │   ├── knowledge_graph.py  # Live Graph Cache
+│   │   ├── rag_pipeline.py     # 4-Agent Orchestrator
+│   │   └── rules_engine.py     # Structural Compliance Engine
 ├── frontend/
 │   ├── src/
-│   │   ├── app/                # Next.js App Router pages
-│   │   └── components/         # React components
-│   ├── package.json
-│   └── Dockerfile
-├── docker-compose.yml
-└── README.md
+│   │   ├── app/                # Next.js Pages (Graph, Assets, QMS)
+│   │   ├── components/         # Copilot Chat, Viz, Sidebar
+│   │   └── utils/              # API and Config layers
 ```
 
-## Tech Stack
-
-| Layer    | Technology                         |
-|----------|------------------------------------|
-| Frontend | Next.js 16, React 19, Tailwind CSS |
-| Backend  | FastAPI, Python 3.11+              |
-| Graph    | NetworkX, react-force-graph-2d     |
-| AI/ML    | Ollama (llama3), RAG Pipeline      |
-| DevOps   | Docker, Docker Compose             |
-
-## License
-
+## 📜 License
 This project is licensed under the [MIT License](./LICENSE).
