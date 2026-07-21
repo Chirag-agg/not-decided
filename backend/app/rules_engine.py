@@ -91,7 +91,7 @@ def evaluate_compliance(graph_data):
             "id": rule["id"],
             "desc": rule["desc"],
             "status": status,
-            "date": "2026-07-21",
+            "date": today.strftime("%Y-%m-%d"),
             "owner": rule["owner"],
             "reasons": reasons[:3] + (["..."] if len(reasons) > 3 else []), # Truncate long lists for UI
             "entities": list(related_entities)
