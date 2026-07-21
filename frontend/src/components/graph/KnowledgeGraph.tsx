@@ -23,7 +23,7 @@ export default function KnowledgeGraph() {
   const fgRef = useRef();
   
   const [ref, bounds] = useMeasure();
-  const { focusedNode } = useGraphContext();
+  const { focusedNode, refreshGraphTrigger } = useGraphContext();
 
   useEffect(() => {
     if (focusedNode && fgRef.current && graphData.nodes.length > 0) {
@@ -54,7 +54,7 @@ export default function KnowledgeGraph() {
     };
     
     fetchGraph();
-  }, []);
+  }, [refreshGraphTrigger]);
 
   // Muted, professional color palette
   const getNodeColor = (group: string) => {

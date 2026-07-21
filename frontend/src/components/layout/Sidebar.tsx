@@ -6,11 +6,13 @@ import { useState, useRef } from "react";
 import { config } from "@/utils/config";
 import { CONSTANTS } from "@/utils/constants";
 import { fetchWithRetry } from "@/utils/api";
+import { useGraphContext } from "@/components/graph/GraphContext";
 
 export default function Sidebar() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { triggerGraphRefresh } = useGraphContext();
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -28,7 +30,9 @@ export default function Sidebar() {
         body: formData,
       });
       if (res.ok) {
-        setUploadStatus("INGESTED [OK]");
+        const data = await res.json();
+        setUploadStatus(`INGESTED [OK] - Nodes: ${data.nodes_added}`);
+        triggerGraphRefresh();
       } else {
         setUploadStatus("ERR: FAILED");
       }

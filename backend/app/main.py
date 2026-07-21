@@ -69,15 +69,106 @@ def get_knowledge_graph():
 
 @app.post("/api/upload")
 async def upload_document(file: UploadFile = File(...)):
-    """Simulates live document ingestion and updating the graph"""
+    """Parses uploaded file, extracts entities, and updates the knowledge graph dynamically."""
     try:
-        # Simulate processing delay
-        import asyncio
-        await asyncio.sleep(2)
+        filename = file.filename
         
-        # In a real app, this would chunk the PDF, embed it, and add to Vector DB
-        logger.info(f"Successfully ingested file: {file.filename}")
-        return {"filename": file.filename, "status": "Ingested", "nodes_added": 1}
+        if filename.endswith(".pdf"):
+            raise HTTPException(status_code=400, detail="PDF parsing is unsupported in the current version. Please upload .txt, .csv, or .json.")
+            
+        # Read content
+        content_bytes = await file.read()
+        try:
+            content_str = content_bytes.decode('utf-8')
+        except UnicodeDecodeError:
+            content_str = content_bytes.decode('latin-1')
+            
+        import csv
+        import json
+        import io
+        import re
+        
+        parsed_text = ""
+        if filename.endswith(".csv"):
+            reader = csv.reader(io.StringIO(content_str))
+            parsed_text = " ".join([" ".join(row) for row in reader])
+        elif filename.endswith(".json"):
+            data = json.loads(content_str)
+            parsed_text = json.dumps(data)
+        else:
+            parsed_text = content_str
+            
+        # Extract entities
+        # Pattern: 2-4 uppercase letters, dash, alphanumerics, optional dash and digits (e.g. PMP-101, SEN-T1, INC-23-089)
+        pattern = r'\b[A-Z]{2,4}-[A-Z0-9]+(?:-\d+)?\b'
+        matches = set(re.findall(pattern, parsed_text.upper()))
+        
+        # Document classification
+        doc_group = "Document"
+        lower_text = parsed_text.lower()
+        lower_name = filename.lower()
+        if "manual" in lower_text or "manual" in lower_name:
+            doc_group = "Document"
+        elif "incident" in lower_text or "incident" in lower_name:
+            doc_group = "Incident"
+        elif "work order" in lower_text or "wo-" in lower_text or "work order" in lower_name:
+            doc_group = "WorkOrder"
+            
+        # Fetch current graph
+        graph_data = cache.get("knowledge_graph")
+        if not graph_data:
+            graph_data = build_knowledge_graph()
+            
+        nodes_added = 0
+        edges_added = 0
+        
+        # Check existing nodes
+        existing_node_ids = {node["id"] for node in graph_data["nodes"]}
+        
+        # Add document node
+        doc_node_id = filename
+        if doc_node_id not in existing_node_ids:
+            graph_data["nodes"].append({
+                "id": doc_node_id,
+                "label": f"{doc_group[:3]}: {filename}",
+                "group": doc_group
+            })
+            existing_node_ids.add(doc_node_id)
+            nodes_added += 1
+            
+        # Process extracted entities
+        for entity in matches:
+            if entity not in existing_node_ids:
+                # Add new entity node (default to Equipment for unknown tags)
+                graph_data["nodes"].append({
+                    "id": entity,
+                    "label": f"Eq: {entity}",
+                    "group": "Equipment"
+                })
+                existing_node_ids.add(entity)
+                nodes_added += 1
+                
+            # Add edge
+            # Ensure "links" key exists (networkx uses "links" normally, but we ensure it)
+            if "links" not in graph_data:
+                graph_data["links"] = []
+            edge = {"source": doc_node_id, "target": entity, "relationship": "references"}
+            graph_data["links"].append(edge)
+            edges_added += 1
+            
+        # Update cache
+        cache.set("knowledge_graph", graph_data)
+        logger.info(f"Successfully ingested {filename}. Found {len(matches)} entities.")
+        
+        return {
+            "filename": filename,
+            "status": "Ingested",
+            "nodes_added": nodes_added,
+            "edges_added": edges_added,
+            "entities_found": list(matches)
+        }
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error uploading document: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail="An error occurred during file ingestion.")
