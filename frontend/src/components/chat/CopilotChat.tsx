@@ -5,7 +5,7 @@ import { Send, Terminal, Mic } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useGraphContext } from "@/components/graph/GraphContext";
-import DOMPurify from "dompurify";
+import DOMPurify from "isomorphic-dompurify";
 import { config } from "@/utils/config";
 import { CONSTANTS } from "@/utils/constants";
 import { fetchWithRetry } from "@/utils/api";
