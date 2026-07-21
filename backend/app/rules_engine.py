@@ -40,7 +40,7 @@ def evaluate_compliance(graph_data):
     
     equipment_nodes = [n for n in graph_data.get("nodes", []) if n.get("group") == "Equipment"]
     
-    today = datetime.strptime("2026-07-21", "%Y-%m-%d")
+    today = datetime.now()
     
     for rule in rules:
         status = "PASS"
