@@ -1,46 +1,41 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #09090b; /* zinc-950 */
-  --color-foreground: #fafafa;
+  /* ISA-101 Industrial Colors */
+  --color-canvas: #1A1D24;
+  --color-surface: #22262E;
+  --color-structural: #343A45;
+  --color-primary-text: #E8EAED;
+  --color-secondary-text: #8B93A1;
   
-  --color-card: #09090b;
-  --color-card-foreground: #fafafa;
-  
-  --color-popover: #09090b;
-  --color-popover-foreground: #fafafa;
-  
-  --color-primary: #f4f4f5; /* zinc-100 */
-  --color-primary-foreground: #09090b;
-  
-  --color-secondary: #27272a; /* zinc-800 */
-  --color-secondary-foreground: #fafafa;
-  
-  --color-muted: #18181b; /* zinc-900 */
-  --color-muted-foreground: #a1a1aa; /* zinc-400 */
-  
-  --color-accent: #27272a;
-  --color-accent-foreground: #fafafa;
-  
-  --color-destructive: #ef4444;
-  --color-destructive-foreground: #fafafa;
-  
-  --color-border: #27272a; /* zinc-800 */
-  --color-input: #18181b; /* zinc-900 */
-  --color-ring: #d4d4d8;
+  /* Status Colors */
+  --color-alarm: #FF5D5D;
+  --color-caution: #F0A03C;
+  --color-nominal: #4ADE80;
+  --color-accent: #3FC1C9;
+
+  /* Tailwind Core Overrides */
+  --color-background: var(--color-canvas);
+  --color-foreground: var(--color-primary-text);
+  --color-border: var(--color-structural);
   
   /* Make all radii sharp */
   --radius-lg: 0px;
   --radius-md: 0px;
   --radius-sm: 0px;
+
+  /* Typography */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-display: var(--font-display);
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-structural;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-canvas text-primary-text antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
@@ -54,11 +49,11 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
+  background: var(--color-structural);
   border-radius: 0px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #52525b;
+  background: var(--color-secondary-text);
 }
 
 @keyframes slideUp {

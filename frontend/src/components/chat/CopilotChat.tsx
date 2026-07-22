@@ -23,7 +23,7 @@ export default function CopilotChat() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "bot",
-      content: "SYSTEM INITIALIZED.\nIndustrial Knowledge Base connected. Awaiting query...",
+      content: "SYSTEM INITIALIZED.\nKeystone Knowledge Base connected. Awaiting query...",
     }
   ]);
   const [input, setInput] = useState("");
@@ -133,13 +133,13 @@ export default function CopilotChat() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-zinc-950 relative">
-      <div className="p-3 border-b border-zinc-800 bg-zinc-900/50 flex justify-between items-center">
-        <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 flex items-center">
+    <div className="flex flex-col h-full bg-canvas relative">
+      <div className="p-3 border-b border-structural bg-surface/50 flex justify-between items-center">
+        <div className="text-[10px] font-sans uppercase tracking-widest text-secondary-text flex items-center font-semibold">
           <Terminal size={12} className="mr-2" />
           Agentic Workspace
         </div>
-        <div className="text-[10px] font-mono uppercase tracking-widest text-green-500">
+        <div className="text-[10px] font-sans uppercase tracking-widest text-nominal font-semibold">
           Ready
         </div>
       </div>
@@ -155,18 +155,18 @@ export default function CopilotChat() {
               className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}
             >
               <div className="flex items-center space-x-2 mb-1">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 font-bold">
+                <span className="text-[10px] font-sans uppercase tracking-widest text-secondary-text font-semibold">
                   {msg.role === "user" ? "OPERATOR" : "AI ASSISTANT"}
                 </span>
               </div>
-              <div className={`p-4 max-w-[90%] shadow-lg ${msg.role === "user" ? "bg-zinc-800 border-r-4 border-blue-500 text-zinc-100" : "bg-zinc-900 border-l-4 border-zinc-500 text-zinc-100"}`}>
+              <div className={`p-4 max-w-[90%] shadow-lg ${msg.role === "user" ? "bg-surface border-r-4 border-accent text-primary-text" : "bg-surface border-l-4 border-structural text-primary-text"}`}>
                 
-                {/* Historical Traces Log (collapsed or minimal) */}
+                {/* Historical Traces Log */}
                 {msg.traces && msg.traces.length > 0 && (
-                  <div className="mb-3 pb-2 border-b border-zinc-700/50">
-                    <div className="text-[10px] font-mono uppercase tracking-widest text-blue-400 mb-1 font-bold">Diagnostics:</div>
+                  <div className="mb-3 pb-2 border-b border-structural/50">
+                    <div className="text-[10px] font-sans uppercase tracking-widest text-accent mb-1 font-semibold">Diagnostics:</div>
                     {msg.traces.map((trace, tIdx) => (
-                      <div key={tIdx} className="text-[11px] font-mono text-zinc-400 truncate leading-relaxed">
+                      <div key={tIdx} className="text-[10px] font-mono text-secondary-text truncate leading-relaxed">
                         &gt; {trace}
                       </div>
                     ))}
@@ -174,14 +174,14 @@ export default function CopilotChat() {
                 )}
                 
                 <p 
-                  className="whitespace-pre-wrap leading-relaxed text-[15px]" 
+                  className="whitespace-pre-wrap leading-relaxed text-sm" 
                   dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(msg.content) }} 
                 />
                 
                 {msg.sources && msg.sources.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-zinc-700/50 flex flex-wrap gap-2">
+                  <div className="mt-3 pt-3 border-t border-structural/50 flex flex-wrap gap-2">
                     {msg.sources.map((src, sIdx) => (
-                      <span key={sIdx} className="text-[10px] font-mono uppercase tracking-widest font-bold bg-zinc-950 border border-zinc-700 text-zinc-400 px-2 py-1">
+                      <span key={sIdx} className="text-[10px] font-mono uppercase tracking-widest font-semibold bg-canvas border border-structural text-secondary-text px-2 py-1">
                         REF: {src}
                       </span>
                     ))}
@@ -189,13 +189,13 @@ export default function CopilotChat() {
                 )}
                 
                 {msg.action && (
-                  <div className="mt-4 pt-3 border-t border-zinc-700/50">
+                  <div className="mt-4 pt-3 border-t border-structural/50">
                     <button 
                       onClick={() => setShowWoModal(true)}
-                      className="w-full flex items-center justify-center space-x-2 bg-zinc-950 border border-green-500/50 hover:border-green-400 hover:bg-green-950/30 text-green-400 font-bold py-3 px-4 transition-colors shadow-[0_0_10px_rgba(34,197,94,0.1)]"
+                      className="w-full flex items-center justify-center space-x-2 bg-canvas border border-accent/50 hover:border-accent hover:bg-accent/10 text-accent font-semibold py-3 px-4 transition-colors"
                     >
                       <Terminal size={18} />
-                      <span className="text-xs font-mono uppercase tracking-widest">Execute: Gen Work Order</span>
+                      <span className="text-xs font-sans uppercase tracking-widest">Execute: Gen Work Order</span>
                     </button>
                   </div>
                 )}
@@ -207,8 +207,8 @@ export default function CopilotChat() {
         {/* Live Traces Simulation */}
         {(isLoading || isSimulatingTraces) && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-start mt-4">
-            <div className="text-[10px] font-mono uppercase tracking-widest text-blue-400 mb-2 flex items-center font-bold">
-              <span className="w-2 h-2 bg-blue-500 mr-2 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>
+            <div className="text-[10px] font-sans uppercase tracking-widest text-accent mb-2 flex items-center font-semibold">
+              <span className="w-2 h-2 bg-accent mr-2 animate-pulse shadow-[0_0_8px_#3FC1C9]"></span>
               EXECUTING AGENTIC PIPELINE...
             </div>
             {activeTraces.map((trace, idx) => (
@@ -216,7 +216,7 @@ export default function CopilotChat() {
                 key={idx}
                 initial={{ opacity: 0, x: -5 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="text-[11px] text-zinc-400 mb-1 font-mono pl-3 border-l-2 border-zinc-700"
+                className="text-[10px] text-secondary-text mb-1 font-mono pl-3 border-l-2 border-structural"
               >
                 &gt; {trace}
               </motion.div>
@@ -229,33 +229,33 @@ export default function CopilotChat() {
           {showWoModal && (
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 z-50 bg-zinc-950/90 backdrop-blur-sm flex items-center justify-center p-4"
+              className="absolute inset-0 z-50 bg-canvas/90 backdrop-blur-sm flex items-center justify-center p-4"
             >
               <motion.div 
                 initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }}
-                className="bg-zinc-900 border border-zinc-700 w-full max-w-md shadow-2xl flex flex-col"
+                className="bg-surface border border-structural w-full max-w-md shadow-2xl flex flex-col"
               >
-                <div className="p-3 border-b border-zinc-800 flex justify-between items-center bg-zinc-950">
-                  <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">
+                <div className="p-3 border-b border-structural flex justify-between items-center bg-canvas">
+                  <div className="text-[10px] font-sans uppercase tracking-widest text-secondary-text font-semibold">
                     Draft // Preventive Maintenance
                   </div>
-                  <button onClick={() => setShowWoModal(false)} className="text-zinc-500 hover:text-zinc-100 uppercase text-[10px] tracking-widest">
+                  <button onClick={() => setShowWoModal(false)} className="text-secondary-text hover:text-primary-text uppercase text-[10px] font-sans font-semibold tracking-widest">
                     [CLOSE]
                   </button>
                 </div>
                 
-                <div className="p-4 space-y-4 text-xs font-mono">
-                  <div className="flex justify-between border-b border-zinc-800 pb-2">
-                    <span className="text-zinc-500 uppercase">Target Asset:</span>
-                    <span className="text-zinc-100">PMP-101 (Main Cooling)</span>
+                <div className="p-4 space-y-4 text-xs font-sans">
+                  <div className="flex justify-between border-b border-structural pb-2">
+                    <span className="text-secondary-text font-semibold uppercase">Target Asset:</span>
+                    <span className="text-primary-text font-mono">PMP-101 (Main Cooling)</span>
                   </div>
-                  <div className="flex justify-between border-b border-zinc-800 pb-2">
-                    <span className="text-zinc-500 uppercase">Priority:</span>
-                    <span className="text-red-400 uppercase tracking-widest bg-red-950 px-1 border border-red-900">CRITICAL</span>
+                  <div className="flex justify-between border-b border-structural pb-2">
+                    <span className="text-secondary-text font-semibold uppercase">Priority:</span>
+                    <span className="text-alarm font-semibold uppercase tracking-widest bg-alarm/10 px-1 border border-alarm/30">CRITICAL</span>
                   </div>
-                  <div className="space-y-2 border-b border-zinc-800 pb-3">
-                    <span className="text-zinc-500 uppercase block">Recommended Actions:</span>
-                    <div className="pl-2 border-l border-zinc-700 text-zinc-300 space-y-1">
+                  <div className="space-y-2 border-b border-structural pb-3">
+                    <span className="text-secondary-text font-semibold uppercase block">Recommended Actions:</span>
+                    <div className="pl-2 border-l border-structural text-primary-text space-y-1">
                       <p>1. Lockout/Tagout PMP-101.</p>
                       <p>2. Inspect drive-side bearings for wear.</p>
                       <p>3. Apply ISO-VG 46 synthetic lubricant.</p>
@@ -264,14 +264,14 @@ export default function CopilotChat() {
                   </div>
                 </div>
 
-                <div className="p-3 bg-zinc-950 border-t border-zinc-800">
+                <div className="p-3 bg-canvas border-t border-structural">
                   <button 
                     onClick={handleApproveWo}
                     disabled={woStatus !== "idle"}
-                    className="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-semibold py-2 transition-colors uppercase tracking-widest text-[10px] flex justify-center items-center"
+                    className="w-full bg-primary-text hover:bg-white text-canvas font-semibold py-2 transition-colors uppercase tracking-widest text-[10px] flex justify-center items-center"
                   >
-                    {woStatus === "idle" && "Approve & Dispatch to SAP-HANA"}
-                    {woStatus === "saving" && <><span className="w-1.5 h-1.5 bg-zinc-900 animate-ping mr-2"></span> Transmitting Payload...</>}
+                    {woStatus === "idle" && "Approve & Dispatch"}
+                    {woStatus === "saving" && <><span className="w-1.5 h-1.5 bg-canvas animate-ping mr-2"></span> Transmitting Payload...</>}
                     {woStatus === "success" && "DISPATCHED [OK]"}
                   </button>
                 </div>
@@ -282,16 +282,16 @@ export default function CopilotChat() {
       </div>
       
         {/* Input Area */}
-        <div className="absolute bottom-0 left-0 w-full p-4 bg-zinc-950 border-t border-zinc-800 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
-          <div className="relative flex items-center bg-zinc-900 border-2 border-zinc-700 focus-within:border-blue-500 transition-colors shadow-inner overflow-hidden">
+        <div className="absolute bottom-0 left-0 w-full p-4 bg-canvas border-t border-structural">
+          <div className="relative flex items-center bg-surface border border-structural focus-within:border-accent transition-colors overflow-hidden">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
               disabled={isLoading || isSimulatingTraces}
-              placeholder={isListening ? "LISTENING..." : "ENTER COMMAND OR QUERY..."}
-              className="w-full bg-transparent text-zinc-100 font-mono text-sm pl-4 pr-24 py-4 outline-none placeholder:text-zinc-500 disabled:opacity-50 uppercase"
+              placeholder={isListening ? "Listening..." : "Enter command or query..."}
+              className="w-full bg-transparent text-primary-text font-sans text-sm pl-4 pr-24 py-4 outline-none placeholder:text-secondary-text disabled:opacity-50"
             />
             <div className="absolute right-2 flex items-center space-x-2">
               <button 
@@ -299,8 +299,8 @@ export default function CopilotChat() {
                 disabled={isLoading || isSimulatingTraces}
                 className={`p-2 border transition-colors ${
                   isListening 
-                    ? 'border-red-500 bg-red-950/50 text-red-400 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.5)]' 
-                    : 'border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-500 hover:text-zinc-100 disabled:opacity-30'
+                    ? 'border-alarm bg-alarm/20 text-alarm animate-pulse' 
+                    : 'border-structural bg-canvas text-secondary-text hover:border-secondary-text hover:text-primary-text disabled:opacity-30'
                 }`}
                 title="Voice Command"
               >
@@ -309,7 +309,7 @@ export default function CopilotChat() {
               <button 
                 onClick={sendMessage}
                 disabled={isLoading || isSimulatingTraces || !input.trim()}
-                className="p-2 border border-blue-500 bg-blue-900/30 text-blue-400 hover:bg-blue-900/60 hover:text-blue-300 disabled:border-zinc-800 disabled:bg-zinc-900 disabled:text-zinc-600 transition-colors shadow-[0_0_10px_rgba(59,130,246,0.2)]"
+                className="p-2 border border-accent bg-accent/10 text-accent hover:bg-accent/20 disabled:border-structural disabled:bg-surface disabled:text-secondary-text transition-colors"
               >
                 <Send size={20} />
               </button>

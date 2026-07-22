@@ -37,17 +37,17 @@ export default function AssetHealth() {
   }, []);
 
   return (
-    <div className="flex flex-col md:flex-row h-screen w-full overflow-hidden bg-zinc-950 text-zinc-100 font-sans">
+    <div className="flex flex-col md:flex-row h-screen w-full overflow-hidden bg-canvas text-primary-text font-sans">
       <Sidebar />
       
       <main className="flex-1 flex flex-col p-8 overflow-y-auto">
-        <header className="pb-4 border-b border-zinc-800 mb-8">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1">Module // Health</div>
-          <h2 className="text-2xl font-semibold tracking-tight text-zinc-100">Asset Intelligence Matrix</h2>
+        <header className="pb-4 border-b border-structural mb-8">
+          <div className="text-[10px] font-sans font-semibold uppercase tracking-widest text-secondary-text mb-1">Module // Health</div>
+          <h2 className="text-2xl font-display font-semibold tracking-tight text-primary-text">Asset Intelligence Matrix</h2>
         </header>
 
-        <div className="bg-zinc-900 border border-zinc-800">
-          <div className="grid grid-cols-6 gap-4 p-4 border-b border-zinc-800 text-[10px] font-mono uppercase tracking-widest text-zinc-500 bg-zinc-950">
+        <div className="bg-surface border border-structural">
+          <div className="grid grid-cols-6 gap-4 p-4 border-b border-structural text-[10px] font-sans font-semibold uppercase tracking-widest text-secondary-text bg-canvas">
             <div>Asset ID</div>
             <div className="col-span-2">Equipment Type</div>
             <div>Health Score</div>
@@ -55,26 +55,26 @@ export default function AssetHealth() {
             <div>Last Maintenance</div>
           </div>
           
-          <div className="divide-y divide-zinc-800 font-mono text-xs">
+          <div className="divide-y divide-structural font-mono text-xs">
             {loading ? (
-              <div className="p-8 text-center text-zinc-500">Scanning graph for assets...</div>
+              <div className="p-8 text-center text-secondary-text font-sans text-sm">Scanning graph for assets...</div>
             ) : assets.length === 0 ? (
-              <div className="p-8 text-center text-zinc-500">No assets found in knowledge graph.</div>
+              <div className="p-8 text-center text-secondary-text font-sans text-sm">No assets found in knowledge graph.</div>
             ) : (
               assets.map((asset) => (
-                <div key={asset.id} className="grid grid-cols-6 gap-4 p-4 items-center hover:bg-zinc-800/50 transition-colors">
-                  <div className="font-semibold text-zinc-100">{asset.id}</div>
-                  <div className="col-span-2 text-zinc-400">{asset.type}</div>
+                <div key={asset.id} className="grid grid-cols-6 gap-4 p-4 items-center hover:bg-surface/50 transition-colors bg-surface">
+                  <div className="font-semibold text-primary-text">{asset.id}</div>
+                  <div className="col-span-2 text-secondary-text font-sans text-sm">{asset.type}</div>
                   
                   {/* Health Bar */}
                   <div className="flex items-center space-x-3">
-                    <div className="flex-1 h-1.5 bg-zinc-800 overflow-hidden">
+                    <div className="flex-1 h-1.5 bg-canvas overflow-hidden">
                       <div 
-                        className={`h-full ${asset.health < 70 ? 'bg-red-500' : asset.health < 85 ? 'bg-amber-500' : 'bg-green-500'}`}
+                        className={`h-full ${asset.health < 70 ? 'bg-alarm' : asset.health < 85 ? 'bg-caution' : 'bg-nominal'}`}
                         style={{ width: `${asset.health}%` }}
                       />
                     </div>
-                    <span className="w-8 text-right">{asset.health}%</span>
+                    <span className="w-8 text-right font-sans text-sm">{asset.health}%</span>
                   </div>
 
                   {/* Risk Badge */}
@@ -82,7 +82,7 @@ export default function AssetHealth() {
                     <StatusBadge status={asset.status as BadgeStatus} showIcon={false} />
                   </div>
 
-                  <div className="text-zinc-500">{asset.lastMaint}</div>
+                  <div className="text-secondary-text font-sans text-sm">{asset.lastMaint}</div>
                 </div>
               ))
             )}
