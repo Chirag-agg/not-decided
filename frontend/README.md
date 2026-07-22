@@ -1,6 +1,6 @@
-# etgen — Frontend
+# Keystone — Frontend
 
-Next.js 16 frontend for the Industrial Knowledge Intelligence Platform.
+This is the Next.js frontend for the Keystone multi-agent graph platform.
 
 ## Stack
 

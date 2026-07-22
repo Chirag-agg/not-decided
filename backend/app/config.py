@@ -2,7 +2,7 @@ import os
 
 class Settings:
     # API Configuration
-    PROJECT_NAME: str = "Industrial Knowledge Intelligence API"
+    PROJECT_NAME: str = "Keystone API"
     VERSION: str = "1.0.0"
     
     # CORS

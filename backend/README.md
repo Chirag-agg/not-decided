@@ -1,6 +1,6 @@
-# etgen — Backend
+# Keystone — Backend
 
-FastAPI-based backend for the Industrial Knowledge Intelligence Platform.
+This is the FastAPI backend for the Keystone multi-agent graph platform.
 
 ## Stack
 

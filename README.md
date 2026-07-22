@@ -1,9 +1,9 @@
 <h1 align="center">
-  ⚡ IndustriAI
+  ⚡ Keystone
 </h1>
 
 <p align="center">
-  <b>Industrial Knowledge Intelligence Platform</b><br/>
+  <b>Keystone Platform</b><br/>
   A multi-agent AI system powered by a live Knowledge Graph hub for enterprise asset management, compliance, and automated diagnostics.
 </p>
 
@@ -18,7 +18,7 @@
 
 ## 🎯 Overview
 
-**IndustriAI** eliminates knowledge fragmentation in asset-intensive industries by merging heterogeneous unstructured data (PDFs, manuals, incident reports) into a single, unified Knowledge Graph. 
+**Keystone** eliminates knowledge fragmentation in asset-intensive industries by merging heterogeneous unstructured data (PDFs, manuals, incident reports) into a single, unified Knowledge Graph. 
 
 Unlike standard RAG pipelines that use isolated Vector Databases, this platform operates on a **Unified Hub Architecture**. When a document is ingested, it mutates a live graph topology. The AI Copilot and the Compliance Rule Engine both evaluate this exact same topology in real-time, providing ground-truth intelligence that is structurally traceable.
 
@@ -93,7 +93,7 @@ npm run dev
 ## 📁 Project Structure
 
 ```
-etgen/
+keystone/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py             # FastAPI App & Endpoints
