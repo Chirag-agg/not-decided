@@ -20,13 +20,16 @@ export const CONSTANTS = {
     RETRY_DELAY: 1000,
   },
 
-  // Node Colors
+  // Node Colors (ISA-101)
   GRAPH_COLORS: {
-    EQUIPMENT: "#60a5fa", // Blue-400
-    DOCUMENT: "#4ade80",  // Green-400
-    INCIDENT: "#f87171",  // Red-400
-    WORK_ORDER: "#fbbf24", // Amber-400
-    DEFAULT: "#a1a1aa",    // Zinc-400
-    LINK: "#27272a"        // Zinc-800
+    EQUIPMENT: "#E8EAED",  // Primary Text (Neutral)
+    DOCUMENT: "#8B93A1",   // Secondary Text (Muted)
+    INCIDENT: "#FF5D5D",   // Alarm Red
+    WORK_ORDER: "#F0A03C", // Caution Amber
+    DEFAULT: "#8B93A1",
+    LINK: "#343A45",       // Structural
+    ACCENT: "#3FC1C9",     // Interactive Accent
+    CANVAS: "#1A1D24",     // Canvas
+    SURFACE: "#22262E"     // Surface
   }
 };

@@ -7,6 +7,8 @@ interface GraphContextType {
   setFocusedNode: (nodeId: string | null) => void;
   refreshGraphTrigger: number;
   triggerGraphRefresh: () => void;
+  pulseTrigger: number;
+  triggerPulse: () => void;
 }
 
 const GraphContext = createContext<GraphContextType | undefined>(undefined);
@@ -14,13 +16,18 @@ const GraphContext = createContext<GraphContextType | undefined>(undefined);
 export function GraphProvider({ children }: { children: ReactNode }) {
   const [focusedNode, setFocusedNode] = useState<string | null>(null);
   const [refreshGraphTrigger, setRefreshGraphTrigger] = useState<number>(0);
+  const [pulseTrigger, setPulseTrigger] = useState<number>(0);
 
   const triggerGraphRefresh = () => {
     setRefreshGraphTrigger(prev => prev + 1);
   };
 
+  const triggerPulse = () => {
+    setPulseTrigger(prev => prev + 1);
+  };
+
   return (
-    <GraphContext.Provider value={{ focusedNode, setFocusedNode, refreshGraphTrigger, triggerGraphRefresh }}>
+    <GraphContext.Provider value={{ focusedNode, setFocusedNode, refreshGraphTrigger, triggerGraphRefresh, pulseTrigger, triggerPulse }}>
       {children}
     </GraphContext.Provider>
   );
