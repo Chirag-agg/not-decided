@@ -1,4 +1,4 @@
 """
-etgen backend application package.
-Industrial Knowledge Intelligence API powered by FastAPI.
+Keystone backend application package.
+Keystone API powered by FastAPI.
 """

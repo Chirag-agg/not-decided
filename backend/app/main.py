@@ -14,7 +14,7 @@ from .rules_engine import evaluate_compliance, get_asset_health
 
 logger = get_logger(__name__)
 
-app = FastAPI(title="Industrial Knowledge Intelligence API")
+app = FastAPI(title="Keystone API")
 
 # Setup CORS for the Next.js frontend
 app.add_middleware(
@@ -45,7 +45,7 @@ async def startup_event():
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the Industrial Knowledge Intelligence API"}
+    return {"message": "Welcome to the Keystone API"}
 
 @app.post("/api/chat", response_model=QueryResponse)
 def chat_with_copilot(request: QueryRequest):
@@ -146,24 +146,43 @@ async def upload_document(file: UploadFile = File(...)):
             nodes_added += 1
             
         # Process extracted entities
-        for entity in matches:
+        entities_list = list(matches)
+        for entity in entities_list:
             if entity not in existing_node_ids:
-                # Add new entity node (default to Equipment for unknown tags)
+                # Add new entity node with correct group based on prefix
+                ent_group = "Equipment"
+                ent_label = f"Eq: {entity}"
+                if entity.startswith("INC-"):
+                    ent_group = "Incident"
+                    ent_label = f"Inc: {entity}"
+                elif entity.startswith("WO-"):
+                    ent_group = "WorkOrder"
+                    ent_label = f"WO: {entity}"
+                    
                 graph_data["nodes"].append({
                     "id": entity,
-                    "label": f"Eq: {entity}",
-                    "group": "Equipment"
+                    "label": ent_label,
+                    "group": ent_group
                 })
                 existing_node_ids.add(entity)
                 nodes_added += 1
                 
-            # Add edge
-            # Ensure "links" key exists (networkx uses "links" normally, but we ensure it)
-            if "links" not in graph_data:
-                graph_data["links"] = []
+            # Add edge from document to entity
+            # NetworkX 3+ uses 'edges', earlier versions use 'links'
+            target_link_key = "edges" if "edges" in graph_data else "links"
+            if target_link_key not in graph_data:
+                graph_data[target_link_key] = []
+                
             edge = {"source": doc_node_id, "target": entity, "relationship": "references"}
-            graph_data["links"].append(edge)
+            graph_data[target_link_key].append(edge)
             edges_added += 1
+            
+        # Cross-link the extracted entities to each other (e.g. MTR-999 to INC-23-089)
+        for i in range(len(entities_list)):
+            for j in range(i + 1, len(entities_list)):
+                edge = {"source": entities_list[i], "target": entities_list[j], "relationship": "related_to"}
+                graph_data[target_link_key].append(edge)
+                edges_added += 1
             
         # Update cache
         cache.set("knowledge_graph", graph_data)

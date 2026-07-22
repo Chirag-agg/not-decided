@@ -30,7 +30,8 @@ class DocumentRetrievalAgent(BaseAgent):
         self._log_trace("SYS_AGENT_SEARCH", f"Mock Vector Search: Querying graph for documents related to {entity_id}")
         
         related_docs = []
-        for link in graph_data.get("links", []):
+        edges = graph_data.get("links", []) + graph_data.get("edges", [])
+        for link in edges:
             if link["source"] == entity_id or link["target"] == entity_id:
                 neighbor_id = link["target"] if link["source"] == entity_id else link["source"]
                 # Verify if neighbor is a Document
@@ -54,7 +55,8 @@ class GraphTraversalAgent(BaseAgent):
         self._log_trace("SYS_AGENT_GRAPH", f"Traversing knowledge graph for entity: {entity_id}")
         
         related_nodes = []
-        for link in graph_data.get("links", []):
+        edges = graph_data.get("links", []) + graph_data.get("edges", [])
+        for link in edges:
             if link["source"] == entity_id or link["target"] == entity_id:
                 neighbor_id = link["target"] if link["source"] == entity_id else link["source"]
                 neighbor_node = next((n for n in graph_data.get("nodes", []) if n["id"] == neighbor_id), None)
@@ -183,7 +185,7 @@ class Orchestrator:
         self.traces.clear()
         
         # 0. Fetch Live Graph Context
-        self.vector_agent._log_trace("ORCHESTRATOR", "Initializing query resolution pipeline.")
+        self.doc_agent._log_trace("ORCHESTRATOR", "Initializing query resolution pipeline.")
         graph_data = cache.get("knowledge_graph")
         if not graph_data:
             graph_data = build_knowledge_graph()
@@ -208,8 +210,8 @@ class Orchestrator:
         # 5. Determine Actions
         action = self.action_agent.execute(requires_action, entity_id)
         
-        sources = docs + graph_nodes
-        self.vector_agent._log_trace("ORCHESTRATOR", f"Pipeline complete. Yielding {len(sources)} sources and {1 if action else 0} action.")
+        sources = doc_context + graph_nodes
+        self.doc_agent._log_trace("ORCHESTRATOR", f"Pipeline complete. Yielding {len(sources)} sources and {1 if action else 0} action.")
         
         return answer, sources, action, list(self.traces), entity_id
 
