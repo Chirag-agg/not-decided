@@ -5,7 +5,9 @@ def get_node(graph_data, node_id):
 
 def get_neighbors(graph_data, node_id):
     neighbors = []
-    for link in graph_data.get("links", []):
+    # Check both "links" and "edges" to handle networkx 2.x and 3.x topologies
+    all_links = graph_data.get("links", []) + graph_data.get("edges", [])
+    for link in all_links:
         if link["source"] == node_id:
             neighbors.append(get_node(graph_data, link["target"]))
         elif link["target"] == node_id:
@@ -80,7 +82,7 @@ def evaluate_compliance(graph_data):
                     has_wo = any(n["group"] == "WorkOrder" for n in inc_neighbors)
                     if not has_wo:
                         status = "FAIL"
-                        reasons.append(f"{eq_id} has unresolved incident {inc['id']}")
+                        reasons.append(f"{eq_id} has an unresolved incident ({inc['id']}) with no linked work order")
                         related_entities.add(eq_id)
                         related_entities.add(inc["id"])
 

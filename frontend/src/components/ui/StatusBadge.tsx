@@ -17,29 +17,29 @@ export function StatusBadge({ status, showIcon = false }: StatusBadgeProps) {
   switch (status) {
     case "PASS":
     case "HEALTHY":
-      bgColor = "bg-green-950";
-      textColor = "text-green-400";
-      borderColor = "border-green-900";
+      bgColor = "bg-nominal/10";
+      textColor = "text-nominal";
+      borderColor = "border-nominal/30";
       Icon = CheckCircle;
       break;
     case "WARNING":
     case "MONITOR":
-      bgColor = "bg-amber-950";
-      textColor = "text-amber-400";
-      borderColor = "border-amber-900";
+      bgColor = "bg-caution/10";
+      textColor = "text-caution";
+      borderColor = "border-caution/30";
       Icon = AlertCircle;
       break;
     case "FAIL":
     case "CRITICAL":
-      bgColor = "bg-red-950";
-      textColor = "text-red-400";
-      borderColor = "border-red-900";
+      bgColor = "bg-alarm/10";
+      textColor = "text-alarm";
+      borderColor = "border-alarm/30";
       Icon = XCircle;
       break;
     default:
-      bgColor = "bg-zinc-950";
-      textColor = "text-zinc-400";
-      borderColor = "border-zinc-900";
+      bgColor = "bg-surface";
+      textColor = "text-secondary-text";
+      borderColor = "border-structural";
   }
 
   return (
