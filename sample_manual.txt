@@ -1,0 +1,11 @@
+MAINTENANCE MANUAL: MTR-999
+
+1. SAFETY WARNING
+Before inspecting the motor, ensure lockout-tagout procedures are followed.
+
+2. TROUBLESHOOTING
+If excessive vibration is detected, check the bearing alignment.
+In case of overheating, verify that cooling fluid from HX-301 is reaching the assembly.
+
+3. INCIDENTS
+Reference historical incident INC-25-001 for known bearing degradation patterns.
